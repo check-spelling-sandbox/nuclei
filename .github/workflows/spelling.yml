@@ -92,57 +92,31 @@ jobs:
     steps:
     - name: check-spelling
       id: spelling
-      uses: check-spelling/check-spelling@v0.0.21
+      uses: check-spelling/check-spelling@v0.0.22
       with:
-        suppress_push_for_open_pull_request: 1
+        suppress_push_for_open_pull_request: ${{ github.actor != 'dependabot[bot]' && 1 }}
         checkout: true
         check_file_names: 1
         spell_check_this: projectdiscovery/nuclei@dev
         post_comment: 0
         use_magic_file: 1
-        experimental_apply_changes_via_bot: ${{ github.repository_owner != 'projectdiscovery' && 1 }}
         use_sarif: ${{ (!github.event.pull_request || (github.event.pull_request.head.repo.full_name == github.repository)) && 1 }}
         extra_dictionary_limit: 20
-        dictionary_source_prefixes: |
-          {"cspell": "https://raw.githubusercontent.com/check-spelling/cspell-dicts/v20220816/dictionaries/", "cspell1": "https://raw.githubusercontent.com/check-spelling/cspell-dicts/v20230509/dictionaries/"}
         extra_dictionaries:
-          cspell1:software-terms/dict/softwareTerms.txt
-          cspell1:golang/dict/go.txt
-          cspell1:filetypes/filetypes.txt
-          cspell1:node/dict/node.txt
-          cspell1:php/dict/php.txt
-          cspell1:aws/aws.txt
-          cspell1:k8s/dict/k8s.txt
-          cspell1:java/src/java.txt
-          cspell1:python/src/python/python-lib.txt
-          cspell1:fullstack/dict/fullstack.txt
-          cspell1:python/src/common/extra.txt
-          cspell1:shell/dict/shell-all-words.txt
-          cspell1:typescript/dict/typescript.txt
-          cspell1:django/dict/django.txt
-          cspell1:html/dict/html.txt
+          cspell:software-terms/dict/softwareTerms.txt
+          cspell:golang/dict/go.txt
+          cspell:filetypes/filetypes.txt
+          cspell:node/dict/node.txt
+          cspell:php/dict/php.txt
+          cspell:aws/aws.txt
+          cspell:k8s/dict/k8s.txt
+          cspell:java/src/java.txt
+          cspell:python/src/python/python-lib.txt
+          cspell:fullstack/dict/fullstack.txt
+          cspell:python/src/common/extra.txt
+          cspell:shell/dict/shell-all-words.txt
+          cspell:typescript/dict/typescript.txt
+          cspell:django/dict/django.txt
+          cspell:html/dict/html.txt
+          cspell:npm/dict/npm.txt
         check_extra_dictionaries: ''
-
-  update:
-    name: Update PR
-    permissions:
-      contents: write
-      pull-requests: write
-      actions: read
-    runs-on: ubuntu-latest
-    if: ${{
-        github.repository_owner != 'projectdiscovery' &&
-        github.event_name == 'issue_comment' &&
-        github.event.issue.pull_request &&
-        contains(github.event.comment.body, '@check-spelling-bot apply')
-      }}
-    concurrency:
-      group: spelling-update-${{ github.event.issue.number }}
-      cancel-in-progress: false
-    steps:
-    - name: apply spelling updates
-      uses: check-spelling/check-spelling@v0.0.21
-      with:
-        experimental_apply_changes_via_bot: 1
-        checkout: true
-        ssh_key: "${{ secrets.CHECK_SPELLING }}"

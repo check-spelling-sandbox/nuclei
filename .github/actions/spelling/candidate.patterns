@@ -12,8 +12,11 @@
 # git index header
 index (?:[0-9a-z]{7,40},|)[0-9a-z]{7,40}\.\.[0-9a-z]{7,40}
 
+# file permissions
+['"`\s][-bcdLlpsw](?:[-r][-w][-Ssx]){2}[-r][-w][-SsTtx]\+?['"`\s]
+
 # css url wrappings
-\burl\([^)]*\)
+#\burl\([^)]+\)
 
 # cid urls
 (['"])cid:.*?\g{-1}
@@ -23,13 +26,13 @@ index (?:[0-9a-z]{7,40},|)[0-9a-z]{7,40}\.\.[0-9a-z]{7,40}
 # data url in quotes
 ([`'"])data:(?:[^ `'"].*?|)(?:[A-Z]{3,}|[A-Z][a-z]{2,}|[a-z]{3,}).*\g{-1}
 # data url
-data:[-a-zA-Z=;:/0-9+]*,\S*
+\bdata:[-a-zA-Z=;:/0-9+]*,\S*
 
 # https/http/file urls
 (?:\b(?:https?|ftp|file)://)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]
 
 # mailto urls
-mailto:[-a-zA-Z=;:/?%&0-9+@.]{3,}
+mailto:[-a-zA-Z=;:/?%&0-9+@._]{3,}
 
 # magnet urls
 magnet:[?=:\w]+
@@ -130,6 +133,8 @@ themes\.googleusercontent\.com/static/fonts/[^/\s"]+/v\d+/[^.]+.
 (?:\[`?[0-9a-f]+`?\]\(https:/|)/(?:www\.|)github\.com(?:/[^/\s"]+){2,}(?:/[^/\s")]+)(?:[0-9a-f]+(?:[-0-9a-zA-Z/#.]*|)\b|)
 # GitHub SHAs
 \bgithub\.com(?:/[^/\s"]+){2}[@#][0-9a-f]+\b
+# GitHub SHA refs
+\[([0-9a-f]+)\]\(https://(?:www\.|)github.com/[-\w]+/[-\w]+/commit/\g{-1}[0-9a-f]*
 # GitHub wiki
 \bgithub\.com/(?:[^/]+/){2}wiki/(?:(?:[^/]+/|)_history|[^/]+(?:/_compare|)/[0-9a-f.]{40,})\b
 # githubusercontent
@@ -146,6 +151,9 @@ themes\.googleusercontent\.com/static/fonts/[^/\s"]+/v\d+/[^.]+.
 \[[^\]]+\]\(https://github\.com/[^/\s"]+/?\)
 # GHSA
 GHSA(?:-[0-9a-z]{4}){3}
+
+# GitHub actions
+\buses:\s+[-\w.]+/[-\w./]+@[-\w.]+
 
 # GitLab commit
 \bgitlab\.[^/\s"]*/\S+/\S+/commit/[0-9a-f]{7,16}#[0-9a-f]{40}\b
@@ -385,7 +393,9 @@ ipfs://[0-9a-zA-Z]{3,}
 (?:\\(?:u00|x)1[Bb]|\x1b|\\u\{1[Bb]\})\[\d+(?:;\d+|)m
 
 # URL escaped characters
-\%[0-9A-F][A-F]
+\%[0-9A-F][A-F](?=[A-Za-z])
+# lower URL escaped characters
+\%[0-9a-f][a-f](?=[a-z]{2,})
 # IPv6
 \b(?:[0-9a-fA-F]{0,4}:){3,7}[0-9a-fA-F]{0,4}\b
 # c99 hex digits (not the full format, just one I've seen)
@@ -434,7 +444,7 @@ integrity=(['"])(?:\s*sha\d+-[-a-zA-Z=;:/0-9+]{40,})+\g{-1}
 Name\[[^\]]+\]=.*
 
 # IServiceProvider / isAThing
-\b(?:I|isA)(?=(?:[A-Z][a-z]{2,})+\b)
+\b(?:I|isA)(?=(?:[A-Z][a-z]{2,})+(?:[A-Z]|\b))
 
 # crypt
 (['"])\$2[ayb]\$.{56}\g{-1}
@@ -455,33 +465,45 @@ content: (['"])[-a-zA-Z=;:/0-9+]*=\g{-1}
 # you'll want to remove the `(?=.*?")` suffix.
 # The `(?=.*?")` suffix should limit the false positives rate
 # printf
-%(?:(?:(?:hh?|ll?|[jzt])?[diuoxn]|l?[cs]|L?[fega]|p)(?=[a-z]{2,})|(?:X|L?[FEGA]|p)(?=[a-zA-Z]{2,}))(?=[_a-zA-Z]+\b)(?!%)(?=.*?['"])
+%(?:(?:(?:hh?|ll?|[jzt])?[diuoxn]|l?[cs]|L?[fega]|p)(?=[a-z]{2,})|(?:X|L?[FEGA]|p)(?=[a-zA-Z]{2,}))(?!%)(?=[_a-zA-Z]+(?!%)\b)(?=.*?['"])
 
 # Python string prefix / binary prefix
 # Note that there's a high false positive rate, remove the `?=` and search for the regex to see if the matches seem like reasonable strings
-(?<!')\b(?:B|BR|Br|F|FR|Fr|R|RB|RF|Rb|Rf|U|UR|Ur|b|bR|br|f|fR|fr|r|rB|rF|rb|rf|u|uR|ur)'(?:[A-Z]{3,}|[A-Z][a-z]{2,}|[a-z]{3,})
+(?<!')\b(?:B|BR|Br|F|FR|Fr|R|RB|RF|Rb|Rf|U|UR|Ur|b|bR|br|f|fR|fr|r|rB|rF|rb|rf|u|uR|ur)'(?=[A-Z]{3,}|[A-Z][a-z]{2,}|[a-z]{3,})
 
 # Regular expressions for (P|p)assword
 \([A-Z]\|[a-z]\)[a-z]+
 
 # JavaScript regular expressions
 # javascript test regex
-/.*/[gim]*\.test\(
+/.{3,}/[gim]*\.test\(
 # javascript match regex
-\.match\(/[^/\s"]*/[gim]*\s*
+\.match\(/[^/\s"]{3,}/[gim]*\s*
 # javascript match regex
-\.match\(/\\[b].*?/[gim]*\s*\)(?:;|$)
+\.match\(/\\[b].{3,}?/[gim]*\s*\)(?:;|$)
 # javascript regex
-^\s*/\\[b].*/[gim]*\s*(?:\)(?:;|$)|,$)
+^\s*/\\[b]{3,}*/[gim]*\s*(?:\)(?:;|$)|,$)
 # javascript replace regex
-\.replace\(/[^/\s"]*/[gim]*\s*,
+\.replace\(/[^/\s"]{3,}/[gim]*\s*,
 # assign regex
-= /[^*].*/
+= /[^*]*?(?:[a-z]{3,}|[A-Z]{3,}|[A-Z][a-z]{2,}).*/
 # perl regex test
-=~ /.*/
+[!=]~ (?:/.*/|m\{.*?\}|m<.*?>|m([|!/@#,;']).*?\g{-1})
+
+# perl qr regex
+(?<!\$)\bqr(?:\{.*?\}|<.*?>|\(.*?\)|([|!/@#,;']).*?\g{-1})
+
+# perl run
+perl(?:\s+-[a-zA-Z]\w*)+
+
+# C network byte conversions
+(?:\d|\bh)to(?=[a-z])|to(?=[adhiklpun]\()
 
 # Go regular expressions
 regexp?\.MustCompile\(`[^`]*`\)
+
+# regex choice
+#\(\?:[^)]+\|[^)]+\)
 
 # proto
 ^\s*(\w+)\s\g{-1} =
@@ -489,8 +511,14 @@ regexp?\.MustCompile\(`[^`]*`\)
 # sed regular expressions
 sed 's/(?:[^/]*?[a-zA-Z]{3,}[^/]*?/){2}
 
+# node packages
+(["'])\@[^/'" ]+/[^/'" ]+\g{-1}
+
 # go install
 go install(?:\s+[a-z]+\.[-@\w/.]+)+
+
+# jetbrains schema https://youtrack.jetbrains.com/issue/RSRP-489571
+urn:shemas-jetbrains-com
 
 # kubernetes pod status lists
 # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase
@@ -503,7 +531,7 @@ go install(?:\s+[a-z]+\.[-@\w/.]+)+
 -[0-9a-f]{10}-\w{5}\s
 
 # posthog secrets
-posthog\.init\((['"])phc_[^"',]+\g{-1},
+([`'"])phc_[^"',]+\g{-1}
 
 # xcode
 
@@ -532,6 +560,9 @@ customObjectInstantitationMethod
 # base64 encoded content, possibly wrapped in mime
 (?:^|[\s=;:?])[-a-zA-Z=;:/0-9+]{50,}(?:[\s=;:?]|$)
 
+# encoded-word
+=\?[-a-zA-Z0-9"*%]+\?[BQ]\?[^?]{0,75}\?=
+
 # Time Zones
 \b(?:Africa|Atlantic|America|Antarctica|Asia|Australia|Europe|Indian|Pacific)(?:/\w+)+
 
@@ -553,12 +584,18 @@ systemd.*?running in system mode \([-+].*\)$
 # Non-English
 [a-zA-Z]*[ÀÁÂÃÄÅÆČÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæčçèéêëìíîïðñòóôõöøùúûüýÿĀāŁłŃńŅņŒœŚśŠšŜŝŸŽžź][a-zA-Z]{3}[a-zA-ZÀÁÂÃÄÅÆČÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæčçèéêëìíîïðñòóôõöøùúûüýÿĀāŁłŃńŅņŒœŚśŠšŜŝŸŽžź]*|[a-zA-Z]{3,}[ÀÁÂÃÄÅÆČÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæčçèéêëìíîïðñòóôõöøùúûüýÿĀāŁłŃńŅņŒœŚśŠšŜŝŸŽžź]|[ÀÁÂÃÄÅÆČÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæčçèéêëìíîïðñòóôõöøùúûüýÿĀāŁłŃńŅņŒœŚśŠšŜŝŸŽžź][a-zA-Z]{3,}
 
+# highlighted letters
+\[[A-Z]\][a-z]+
+
 # French
 # This corpus only had capital letters, but you probably want lowercase ones as well.
 \b[LN]'+[a-z]{2,}\b
 
-# latex
+# latex (check-spelling <= 0.0.21)
 \\(?:n(?:ew|ormal|osub)|r(?:enew)|t(?:able(?:of|)|he|itle))(?=[a-z]+)
+
+# latex (check-spelling >= 0.0.22)
+\\\w{2,}\{
 
 # eslint
 "varsIgnorePattern": ".+"
@@ -566,12 +603,17 @@ systemd.*?running in system mode \([-+].*\)$
 # Windows short paths
 [/\\][^/\\]{5,6}~\d{1,2}[/\\]
 
-# in a version of check-spelling after @0.0.21 printf markers won't be automatically consumed
+# in check-spelling@v0.0.22+, printf markers aren't automatically consumed
 # printf markers
 (?<!\\)\\[nrt](?=[a-z]{2,})
+# alternate markers if you run into latex and friends
+(?<!\\)\\[nrt](?=[a-z]{2,})(?=.*['"`])
 
 # apache
 a2(?:en|dis)
+
+# weak e-tag
+W/"[^"]+"
 
 # the negative lookahead here is to allow catching 'templatesz' as a misspelling
 # but to otherwise recognize a Windows path with \templates\foo.template or similar:

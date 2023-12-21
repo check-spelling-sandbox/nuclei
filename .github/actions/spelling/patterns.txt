@@ -1,49 +1,56 @@
 # See https://github.com/check-spelling/check-spelling/wiki/Configuration-Examples:-patterns
 
 # Automatically suggested patterns
+# hit-count: 1626 file-count: 89
+# https/http/file urls
+(?:\b(?:https?|ftp|file)://)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]
+
 # hit-count: 774 file-count: 1
 # ANSI color codes
 (?:\\(?:u00|x)1[Bb]|\x1b|\\u\{1[Bb]\})\[\d+(?:;\d+|)m
 
-# hit-count: 449 file-count: 79
-# https/http/file urls
-(?:\b(?:https?|ftp|file)://)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]
-
-# hit-count: 62 file-count: 15
+# hit-count: 93 file-count: 22
 # version suffix <word>v#
 (?:(?<=[A-Z]{2})V|(?<=[a-z]{2}|[A-Z]{2})v)\d+(?:\b|(?=[a-zA-Z_]))
 
-# hit-count: 59 file-count: 3
+# hit-count: 63 file-count: 7
 # base64 encoded content, possibly wrapped in mime
 (?:^|[\s=;:?])[-a-zA-Z=;:/0-9+]{50,}(?:[\s=;:?]|$)
 
-# hit-count: 48 file-count: 10
-# in a version of check-spelling after @0.0.21 printf markers won't be automatically consumed
+# hit-count: 51 file-count: 10
+# in check-spelling@v0.0.22+, printf markers aren't automatically consumed
 # printf markers
 (?<!\\)\\[nrt](?=[a-z]{2,})
 
-# hit-count: 28 file-count: 12
+# hit-count: 44 file-count: 25
+# GitHub SHAs (markdown)
+(?:\[`?[0-9a-f]+`?\]\(https:/|)/(?:www\.|)github\.com(?:/[^/\s"]+){2,}(?:/[^/\s")]+)(?:[0-9a-f]+(?:[-0-9a-zA-Z/#.]*|)\b|)
+
+# hit-count: 33 file-count: 13
 # hex runs
 \b[0-9a-fA-F]{16,}\b
 
-# hit-count: 14 file-count: 7
-# URL escaped characters
-\%[0-9A-F][A-F]
+# hit-count: 9 file-count: 6
+# GitHub actions
+\buses:\s+[-\w.]+/[-\w./]+@[-\w.]+
+
+# hit-count: 8 file-count: 8
+# C network byte conversions
+(?:\d|\bh)to(?=[a-z])|to(?=[adhiklpun]\()
+
+# hit-count: 7 file-count: 3
+# lower URL escaped characters
 \%[0-9a-f][a-f](?=[a-z]{2,})
 
-# hit-count: 12 file-count: 4
-# Contributor
-\[[^\]]+\]\(https://github\.com/[^/\s"]+/?\)
+# hit-count: 6 file-count: 3
+# URL escaped characters
+\%[0-9A-F][A-F](?=[A-Za-z])
 
-# hit-count: 9 file-count: 2
+# hit-count: 6 file-count: 2
 # IPv6
 \b(?:[0-9a-fA-F]{0,4}:){3,7}[0-9a-fA-F]{0,4}\b
 
-# hit-count: 8 file-count: 4
-# Twitter markdown
-\[\@[^[/\]:]*?\]\(https://twitter.com/[^/\s"')]*(?:/status/\d+(?:\?[-_0-9a-zA-Z&=]*|)|)\)
-
-# hit-count: 6 file-count: 6
+# hit-count: 5 file-count: 5
 # Go regular expressions
 regexp?\.MustCompile\(`[^`]*`\)
 
@@ -51,11 +58,9 @@ regexp?\.MustCompile\(`[^`]*`\)
 # base64 encoded content
 ([`'"])[-a-zA-Z=;:/0-9+]+=\g{-1}
 
-_IWP_JSON_PREFIX_[-a-zA-Z=;:/0-9+]+
-
-# hit-count: 4 file-count: 4
-# mailto urls
-mailto:[-a-zA-Z=;:/?%&0-9+@.]{3,}
+# hit-count: 5 file-count: 3
+# githubusercontent
+/[-a-z0-9]+\.githubusercontent\.com/[-a-zA-Z0-9?&=_\/.]*
 
 # hit-count: 4 file-count: 4
 # hex digits including css/html color classes:
@@ -65,9 +70,13 @@ mailto:[-a-zA-Z=;:/?%&0-9+@.]{3,}
 # basic auth
 (['"])Basic [-a-zA-Z=;:/0-9+]{3,}\g{-1}
 
-# hit-count: 3 file-count: 1
-# tput arguments -- https://man7.org/linux/man-pages/man5/terminfo.5.html -- technically they can be more than 5 chars long...
-\btput\s+(?:(?:-[SV]|-T\s*\w+)\s+)*\w{3,5}\b
+# hit-count: 2 file-count: 2
+# sha-... -- uses a fancy capture
+(\\?['"]|&quot;)[0-9a-f]{40,}\g{-1}
+
+# hit-count: 2 file-count: 2
+# hex in url queries
+=[0-9a-fA-F]*?(?:[A-F]{3,}|[a-f]{3,})[0-9a-fA-F]*?&
 
 # hit-count: 1 file-count: 1
 # go install
@@ -76,6 +85,12 @@ go install(?:\s+[a-z]+\.[-@\w/.]+)+
 # hit-count: 1 file-count: 1
 # base64 encoded content in xml/sgml
 >[-a-zA-Z=;:/0-9+]+=</
+
+# hit-count: 1 file-count: 1
+# tput arguments -- https://man7.org/linux/man-pages/man5/terminfo.5.html -- technically they can be more than 5 chars long...
+\btput\s+(?:(?:-[SV]|-T\s*\w+)\s+)*\w{3,5}\b
+
+_IWP_JSON_PREFIX_[-a-zA-Z=;:/0-9+]+
 
 # Questionably acceptable forms of `in to`
 # Personally, I prefer `log into`, but people object
@@ -87,17 +102,17 @@ go install(?:\s+[a-z]+\.[-@\w/.]+)+
 
 # acceptable duplicates
 # ls directory listings
-[-bcdlpsw](?:[-r][-w][-Ssx]){3}\s+\d+\s+\S+\s+\S+\s+\d+\s+
+[-bcdlpsw](?:[-r][-w][-SsTtx]){3}[\.+*]?\s+\d+\s+\S+\s+\S+\s+\d+\s+
 # mount
 \bmount\s+-t\s+(\w+)\s+\g{-1}\b
 # C types and repeated CSS values
-\s(center|div|inherit|long|LONG|none|normal|solid|thin|transparent|very)(?: \g{-1})+\s
+\s(auto|center|div|inherit|long|LONG|none|normal|solid|thin|transparent|very)(?: \g{-1})+\s
 # C struct
 \bstruct\s+(\w+)\s+\g{-1}\b
 # go templates
 \s(\w+)\s+\g{-1}\s+\`(?:graphql|inject|json|mapping|yaml):
 # doxygen / javadoc / .net
-(?:[\\@](?:brief|groupname|t?param|return|retval)|(?:public|private)(?:\s+static|\s+readonly)*)\s+(\w+)\s+\g{-1}\s
+(?:[\\@](?:brief|groupname|t?param|return|retval)|(?:public|private|\[Parameter(?:\(.+\)|)\])(?:\s+static|\s+override|\s+readonly)*)(?:\s+\{\w+\}|)\s+(\w+)\s+\g{-1}\s
 
 # Commit message -- Signed-off-by and friends
 ^\s*(?:(?:Based-on-patch|Co-authored|Helped|Mentored|Reported|Reviewed|Signed-off)-by|Thanks-to): (?:[^<]*<[^>]*>|[^<]*)\s*$

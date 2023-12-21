@@ -80,6 +80,8 @@
 \.zip$
 ^\.github/actions/spelling/
 ^\Q.github/workflows/spelling.yml\E$
+^\Qcmd/functional-test/targets.txt\E$
+^\Qcmd/integration-test/generic.go\E$
 ^\Qstatic/regression-cycle.md\E$
 ^\Qv2/cmd/functional-test/targets.txt\E$
 ^\Qv2/cmd/integration-test/generic.go\E$
